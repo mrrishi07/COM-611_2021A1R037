@@ -1,0 +1,100 @@
+
+import numpy as np
+import pandas as pd
+#loading data from CSV FIle
+data=pd.DataFrame(data=pd.read_csv('try.csv'))
+print(data)
+     Sky airTemp humidity    wind water forecast enjoysport
+0  Sunny    Warm   Normal  Strong  Warm     Same        Yes
+1  Sunny    Warm     High  Strong  Warm     Same        Yes
+2  Rainy    Cold     High  Strong  Warm   Change         No
+3  Sunny    Warm     High  Strong  Cool   Change        Yes
+#Seperating concept features from Target
+concepts=np.array(data.iloc[:,0:-1])
+print(concepts)
+[['Sunny' 'Warm' 'Normal' 'Strong' 'Warm' 'Same']
+ ['Sunny' 'Warm' 'High' 'Strong' 'Warm' 'Same']
+ ['Rainy' 'Cold' 'High' 'Strong' 'Warm' 'Change']
+ ['Sunny' 'Warm' 'High' 'Strong' 'Cool' 'Change']]
+#Isolating target into a seperate DataFrame
+#copying last column to target array
+target=np.array(data.iloc[:,-1])
+print(target)
+['Yes' 'Yes' 'No' 'Yes']
+def learn(concepts,target):
+    '''
+    learn() function implements the learning method of the Candidate elimination 
+    Arguments:
+        concepts- a data frame with all the features
+    '''
+    #.copy makes sure a new list is created instead of just pointing to the
+    specific_h=concepts[0].copy()
+    print("\n Initialization of specific_h and general_h")
+    print(specific_h)
+    
+    general_h=[["?" for i in range(len(specific_h))] for i in range(len(specific_h))]
+    print(general_h)
+    #The learning iterations
+    for i,h in enumerate(concepts):
+        #Checking if the hypothesis has a positive target
+        if target[i]=="Yes":
+            for x in range(len(specific_h)):
+                #change values in S and G only if values change
+                if h[x] != specific_h[x]:
+                    specific_h[x]='?'
+                    general_h[x][x]='?'
+        #checking if the hypothesis has a negative target
+        if target[i]=="No":
+            for x in range(len(specific_h)):
+                #For negative hypothesis change value only in G
+                if h[x] != specific_h[x]:
+                    general_h[x][x]=specific_h[x]
+                else:
+                    general_h[x][x]='?'
+                    
+        print("\nSteps of Candidate Eliminate Algorithm",i+1)
+        print(specific_h)
+        print(general_h)
+        
+    # find indices where we have empty rows, meaning those that are unchanged
+    indices= [i for i,val in enumerate(general_h) if val==['?','?','?','?','?','?']]
+    for i in indices:
+        #remove those rows from general_h
+        general_h.remove(['?','?','?','?','?','?'])
+    #return final values
+    return specific_h,general_h
+ 
+s_final, g_final = learn(concepts,target)
+print("\nFinal Specific_h:",s_final,sep="\n")
+print("\nFinal General_h:",g_final,sep="\n")
+ Initialization of specific_h and general_h
+['Sunny' 'Warm' 'Normal' 'Strong' 'Warm' 'Same']
+[['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?']]
+
+Steps of Candidate Eliminate Algorithm 1
+['Sunny' 'Warm' 'Normal' 'Strong' 'Warm' 'Same']
+[['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?']]
+
+Steps of Candidate Eliminate Algorithm 2
+['Sunny' 'Warm' '?' 'Strong' 'Warm' 'Same']
+[['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?']]
+
+Steps of Candidate Eliminate Algorithm 3
+['Sunny' 'Warm' '?' 'Strong' 'Warm' 'Same']
+[['Sunny', '?', '?', '?', '?', '?'], ['?', 'Warm', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', 'Same']]
+
+Steps of Candidate Eliminate Algorithm 4
+['Sunny' 'Warm' '?' 'Strong' '?' '?']
+[['Sunny', '?', '?', '?', '?', '?'], ['?', 'Warm', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?'], ['?', '?', '?', '?', '?', '?']]
+
+Final Specific_h:
+['Sunny' 'Warm' '?' 'Strong' '?' '?']
+
+Final General_h:
+[['Sunny', '?', '?', '?', '?', '?'], ['?', 'Warm', '?', '?', '?', '?']]
+ 
+ 
+ 
+ 
+ 
+ 
